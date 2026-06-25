@@ -1,7 +1,7 @@
 services:
   frontend:
     build: .
-    container_name: stayclear
+    container_name: perbudge
     ports:
       - "4500:4500"
     restart: always
