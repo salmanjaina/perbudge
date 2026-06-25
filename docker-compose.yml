@@ -1,0 +1,10 @@
+services:
+  frontend:
+    build: .
+    container_name: stayclear
+    ports:
+      - "4500:4500"
+    restart: always
+    environment:
+      - NODE_ENV=production
+      - PORT=4500
