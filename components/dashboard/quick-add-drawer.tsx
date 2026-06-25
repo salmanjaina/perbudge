@@ -22,18 +22,35 @@ import {
   CreditCard,
   Banknote,
   ArrowLeft,
+  Delete,
 } from "lucide-react";
 import type { PaymentMode } from "@/lib/models/transaction";
 
 interface QuickAddDrawerProps {
-  children: React.ReactNode;
+  children?: React.ReactNode;
+  triggerShortcut?: boolean;
 }
 
 type Step = "amount" | "category" | "details" | "success";
 
-export function QuickAddDrawer({ children }: QuickAddDrawerProps) {
+export function QuickAddDrawer({ children, triggerShortcut }: QuickAddDrawerProps) {
   const isDesktop = useMediaQuery("(min-width: 768px)");
   const [open, setOpen] = useState(false);
+
+  useEffect(() => {
+    if (!triggerShortcut) return;
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (open) return;
+      const target = e.target as HTMLElement;
+      if (target.tagName === "INPUT" || target.tagName === "TEXTAREA" || target.isContentEditable) return;
+      if (e.key === "a" || e.key === "A" || e.key === "n" || e.key === "N") {
+        e.preventDefault();
+        setOpen(true);
+      }
+    };
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, [triggerShortcut, open]);
 
   const handleOpenChange = (newOpen: boolean) => {
     setOpen(newOpen);
@@ -95,6 +112,20 @@ export function QuickAddDrawer({ children }: QuickAddDrawerProps) {
   const handleCategorySelect = (cat: string) => {
     setCategory(cat);
     setStep("details");
+  };
+
+  const handleNumpad = (key: string | number) => {
+    if (key === "backspace") {
+      setAmount((prev) => prev.slice(0, -1));
+    } else if (key === ".") {
+      if (!amount.includes(".")) setAmount((prev) => prev + ".");
+    } else {
+      if (amount === "0" && key !== ".") {
+        setAmount(String(key));
+      } else if (amount.length < 8) {
+        setAmount((prev) => prev + String(key));
+      }
+    }
   };
 
   const handleSubmit = async () => {
@@ -216,27 +247,31 @@ export function QuickAddDrawer({ children }: QuickAddDrawerProps) {
             ))}
           </div>
 
-          {/* Amount input */}
-          <div className="text-center space-y-2">
-            <span className="text-sm text-muted-foreground">Amount</span>
-            <div className="flex items-center justify-center gap-2">
-              <span className="text-3xl text-muted-foreground">₹</span>
-              <input
-                autoFocus
-                type="number"
-                inputMode="decimal"
-                value={amount}
-                onChange={(e) => setAmount(e.target.value)}
-                onKeyDown={(e) => {
-                  if (e.key === "Enter" && amount) {
-                    e.preventDefault();
-                    setStep("category");
-                  }
-                }}
-                placeholder="0"
-                className="text-5xl font-bold text-center bg-transparent border-none outline-none w-full max-w-[200px] font-mono [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
-              />
+          {/* Amount Display */}
+          <div className="text-center space-y-4">
+            <span className="text-sm font-medium text-muted-foreground uppercase tracking-wider">Amount</span>
+            <div className="flex items-center justify-center gap-2 mb-2">
+              <span className="text-4xl text-muted-foreground">₹</span>
+              <div
+                className={`text-6xl font-bold text-center w-full max-w-[200px] font-mono tracking-tighter ${!amount ? "text-muted-foreground/30" : "text-foreground"}`}
+              >
+                {amount || "0"}
+              </div>
             </div>
+          </div>
+
+          {/* Custom Numpad */}
+          <div className="grid grid-cols-3 gap-3 max-w-[280px] mx-auto mb-2">
+            {[1, 2, 3, 4, 5, 6, 7, 8, 9, ".", 0, "backspace"].map((key) => (
+              <Button
+                key={key}
+                variant="outline"
+                className="h-14 text-2xl font-normal rounded-2xl bg-muted/20 border-border/50 hover:bg-muted/50 transition-colors"
+                onClick={() => handleNumpad(key)}
+              >
+                {key === "backspace" ? <Delete className="h-6 w-6" /> : key}
+              </Button>
+            ))}
           </div>
 
           <Button
@@ -412,8 +447,8 @@ export function QuickAddDrawer({ children }: QuickAddDrawerProps) {
   if (isDesktop) {
     return (
       <Dialog open={open} onOpenChange={handleOpenChange}>
-        <DialogTrigger asChild>{children}</DialogTrigger>
-        <DialogContent className="sm:max-w-[440px] p-6">
+        {children && <DialogTrigger asChild>{children}</DialogTrigger>}
+        <DialogContent className="sm:max-w-[440px] p-6 shadow-2xl rounded-3xl border-border/60">
           {content}
         </DialogContent>
       </Dialog>
@@ -422,8 +457,8 @@ export function QuickAddDrawer({ children }: QuickAddDrawerProps) {
 
   return (
     <Drawer open={open} onOpenChange={handleOpenChange}>
-      <DrawerTrigger asChild>{children}</DrawerTrigger>
-      <DrawerContent className="px-4 pb-6 pt-4">
+      {children && <DrawerTrigger asChild>{children}</DrawerTrigger>}
+      <DrawerContent className="px-4 pb-6 pt-4 border-t-border/60 shadow-2xl rounded-t-3xl">
         <div className="mx-auto w-12 h-1.5 rounded-full bg-muted mb-4" />
         {content}
       </DrawerContent>

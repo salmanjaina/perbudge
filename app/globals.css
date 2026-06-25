@@ -131,6 +131,6 @@
 
 @layer utilities {
   .translucent-surface {
-    @apply bg-background/95 backdrop-blur shadow-sm;
+    @apply bg-background/90 backdrop-blur-xl border border-border/60 shadow-[0_8px_30px_rgb(0,0,0,0.04)] dark:shadow-[0_8px_30px_rgb(0,0,0,0.1)] rounded-3xl;
   }
 }

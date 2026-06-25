@@ -50,7 +50,7 @@ export default async function DashboardPage() {
       {/* Charts Row */}
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-7">
         {/* Spending Chart - takes more space */}
-        <Card className="col-span-full lg:col-span-4 translucent-surface border-0">
+        <Card className="col-span-full lg:col-span-4 translucent-surface">
           <CardHeader>
             <CardTitle className="text-base">Daily Spending</CardTitle>
             <p className="text-xs text-muted-foreground">
@@ -63,7 +63,7 @@ export default async function DashboardPage() {
         </Card>
 
         {/* Category Donut */}
-        <Card className="col-span-full lg:col-span-3 translucent-surface border-0">
+        <Card className="col-span-full lg:col-span-3 translucent-surface">
           <CardHeader>
             <CardTitle className="text-base">Where Money Goes</CardTitle>
             <p className="text-xs text-muted-foreground">
@@ -77,7 +77,7 @@ export default async function DashboardPage() {
       </div>
 
       {/* Recent Transactions */}
-      <Card className="translucent-surface border-0">
+      <Card className="translucent-surface">
         <CardHeader className="flex flex-row items-center justify-between">
           <div>
             <CardTitle className="text-base">Recent Transactions</CardTitle>
